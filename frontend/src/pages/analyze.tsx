@@ -119,7 +119,7 @@ export default function AnalyzePage() {
 			<a className="skip-link" href="#analysis-content">
 				Skip to results
 			</a>
-			<header className="border-b border-border bg-card">
+			<header className="border-b border-border bg-card lg:sticky lg:top-0 z-10">
 				<div className="mx-auto flex container items-center justify-between px-5 py-4">
 					<Link to="/" className="flex items-center gap-2 font-semibold">
 						<span
@@ -138,8 +138,8 @@ export default function AnalyzePage() {
 					</Link>
 				</div>
 			</header>
-			<div className="mx-auto grid container lg:grid-cols-[390px_1fr]">
-				<aside className="border-b border-border bg-card p-5 lg:min-h-[calc(100vh-65px)] lg:border-r lg:border-b-0 lg:p-7 sticky top-0">
+			<div className="mx-auto grid container lg:grid-cols-[390px_1fr] relative">
+				<aside className="border-b border-border bg-card p-5 lg:min-h-[calc(100dvh-65px)] lg:border-r lg:border-b-0 lg:p-7 lg:sticky lg:top-[65px] lg:self-start">
 					<div className="mb-7">
 						<p className="text-[11px] font-bold tracking-[.16em] text-blue uppercase">
 							New analysis

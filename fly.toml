@@ -1,10 +1,10 @@
-# fly.toml app configuration file generated for storyflow on 2026-08-10T20:41:56+05:30
+# fly.toml app configuration file generated for storyflow on 2026-08-10T21:07:40+05:30
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
 app = 'storyflow'
-primary_region = 'sin'
+primary_region = 'lhr'
 
 [build]
 [http_service]
@@ -17,6 +17,5 @@ primary_region = 'sin'
 
 [[vm]]
   memory = '256mb'
-  cpu_kind = 'shared'
   cpus = 1
   memory_mb = 256
