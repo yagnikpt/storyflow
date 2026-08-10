@@ -1,0 +1,5 @@
+import { Sparkles } from "lucide-react";
+
+export function AnalysisEmptyState() {
+	return <div className="paper-grid grain flex min-h-[620px] flex-col justify-between overflow-hidden rounded-xl border border-border p-7 sm:p-10"><div className="flex items-center justify-between"><span className="rounded-full bg-secondary px-3 py-1 text-[11px] font-bold tracking-[.12em] text-blue uppercase">Ready when you are</span><Sparkles aria-hidden="true" className="text-coral"/></div><div className="max-w-xl"><p className="font-display text-5xl leading-[.95] sm:text-6xl">From a spark<br/>to the whole season.</p><p className="mt-6 max-w-md text-sm leading-6 text-muted-foreground">Describe the story you want to tell. You’ll get an episode map, script package, emotional rhythm, and practical notes for the cut.</p></div><div className="flex gap-3 border-t border-border pt-5 text-xs text-muted-foreground"><span>Story</span><span>→</span><span>Episodes</span><span>→</span><span>Retention plan</span></div></div>;
+}

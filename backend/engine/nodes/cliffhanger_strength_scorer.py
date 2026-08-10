@@ -22,6 +22,8 @@ def cliffhanger_strength_scorer_node(state: EpisodeEngineState) -> dict:
     model = get_model().with_structured_output(CliffhangerAnalysis)
 
     scripts = state["episode_scripts"]
+    if not scripts:
+        return {"cliffhanger_analysis": None}
     scripts_json = scripts.model_dump_json(indent=2)
 
     messages = [
@@ -31,6 +33,6 @@ def cliffhanger_strength_scorer_node(state: EpisodeEngineState) -> dict:
         ),
     ]
 
-    result: CliffhangerAnalysis = model.invoke(messages)
+    result = model.invoke(messages)
 
     return {"cliffhanger_analysis": result}

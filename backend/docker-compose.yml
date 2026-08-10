@@ -1,21 +1,20 @@
 services:
   postgres:
-    image: pgvector/pgvector:pg17
-    container_name: vplayer-postgres
+    image: postgres:17-trixie
+    container_name: storyflow-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: vplayer
+      POSTGRES_DB: storyflow
     ports:
       - "5432:5432"
     volumes:
-      - postgres_vplayer:/var/lib/postgresql/data
+      - postgres_storyflow:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d vplayer"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d storyflow"]
       interval: 10s
       timeout: 5s
       retries: 5
 
 volumes:
-  postgres_vplayer:
-
+  postgres_storyflow:

@@ -1,14 +1,92 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/crimson-pro/wght.css";
 
-:root {
-  color-scheme: dark;
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "Geist Variable", Arial, sans-serif;
+  --font-display: "Crimson Pro Variable", serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-paper: #f6f5f1;
+  --color-ink: #112844;
+  --color-blue: #2456d7;
+  --color-coral: #f36e55;
+  --color-mist: #e8edf8;
+  --color-line: #d7d9d7;
 }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  font-family: "Inter Variable", "Inter", sans-serif;
-  background: #020617;
+:root {
+  --background: #f6f5f1;
+  --foreground: #112844;
+  --card: #ffffff;
+  --card-foreground: #112844;
+  --popover: #ffffff;
+  --popover-foreground: #112844;
+  --primary: #112844;
+  --primary-foreground: #f6f5f1;
+  --secondary: #e8edf8;
+  --secondary-foreground: #112844;
+  --muted: #eef0ec;
+  --muted-foreground: #657182;
+  --accent: #f36e55;
+  --accent-foreground: #112844;
+  --destructive: #bd3f31;
+  --border: #d7d9d7;
+  --input: #d7d9d7;
+  --ring: #2456d7;
+  --radius: 0.75rem;
+}
+
+html { scroll-behavior: smooth; -webkit-tap-highlight-color: #2456d722; }
+body { touch-action: manipulation; }
+button, input, textarea, select { font: inherit; }
+button { cursor: pointer; }
+a, button, input, textarea { -webkit-tap-highlight-color: transparent; }
+::selection { background: #b8c9f6; color: #112844; }
+
+.tabular { font-variant-numeric: tabular-nums; }
+.skip-link { position: fixed; z-index: 50; left: 1rem; top: -4rem; border-radius: .5rem; background: var(--primary); color: var(--primary-foreground); padding: .75rem 1rem; font-size: .875rem; font-weight: 600; transition: top .16s ease; }
+.skip-link:focus { top: 1rem; }
+.paper-grid { background-image: linear-gradient(#11284408 1px, transparent 1px), linear-gradient(90deg, #11284408 1px, transparent 1px); background-size: 28px 28px; }
+.episode-ribbon { background: linear-gradient(180deg, #f36e55 0%, #f6a46d 47%, #2456d7 100%); }
+.grain { position: relative; }
+.grain::after { content: ""; pointer-events: none; position: absolute; inset: 0; opacity: .08; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.75'/%3E%3C/svg%3E"); mix-blend-mode: multiply; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .rise { animation: rise .55s cubic-bezier(.2,.75,.2,1) both; }
+  .rise-delay { animation: rise .55s .11s cubic-bezier(.2,.75,.2,1) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

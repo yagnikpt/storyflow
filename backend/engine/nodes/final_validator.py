@@ -29,6 +29,14 @@ def final_validator_node(state: EpisodeEngineState) -> dict:
     cliffhanger_analysis = state["cliffhanger_analysis"]
     retention_analysis = state["retention_analysis"]
 
+    if (
+        not scripts
+        or not emotional_arc
+        or not cliffhanger_analysis
+        or not retention_analysis
+    ):
+        return {"final_validation": None}
+
     messages = [
         SystemMessage(content=FINAL_VALIDATOR_SYSTEM),
         HumanMessage(
@@ -41,7 +49,7 @@ def final_validator_node(state: EpisodeEngineState) -> dict:
         ),
     ]
 
-    result: FinalValidation = model.invoke(messages)
+    result = model.invoke(messages)
 
     updates: dict = {
         "final_validation": result,

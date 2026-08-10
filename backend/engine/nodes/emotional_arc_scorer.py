@@ -19,6 +19,8 @@ def emotional_arc_scorer_node(state: EpisodeEngineState) -> dict:
     model = get_model().with_structured_output(EmotionalArc)
 
     scripts = state["episode_scripts"]
+    if not scripts:
+        return {"emotional_arc": None}
     scripts_json = scripts.model_dump_json(indent=2)
 
     messages = [
@@ -28,6 +30,6 @@ def emotional_arc_scorer_node(state: EpisodeEngineState) -> dict:
         ),
     ]
 
-    result: EmotionalArc = model.invoke(messages)
+    result = model.invoke(messages)
 
     return {"emotional_arc": result}

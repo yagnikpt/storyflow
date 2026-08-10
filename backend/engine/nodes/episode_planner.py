@@ -32,6 +32,9 @@ def episode_planner_node(state: EpisodeEngineState) -> dict:
 
     task = state["task"]
     expanded_story = state["expanded_story"]
+    if not expanded_story:
+        return {"episode_planner": None}
+
     story_text = expanded_story.model_dump_json(indent=2)
 
     feedback = state.get("final_validation_feedback", "")
@@ -54,6 +57,6 @@ def episode_planner_node(state: EpisodeEngineState) -> dict:
         HumanMessage(content=human_content),
     ]
 
-    result: EpisodePlanner = model.invoke(messages)
+    result = model.invoke(messages)
 
     return {"episode_planner": result}

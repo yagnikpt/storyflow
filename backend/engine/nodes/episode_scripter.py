@@ -19,15 +19,15 @@ def episode_scripter_node(state: EpisodeEngineState) -> dict:
     model = get_model().with_structured_output(EpisodeScripts)
 
     planner = state["episode_planner"]
+    if not planner:
+        return {"episode_scripts": None}
     planner_json = planner.model_dump_json(indent=2)
 
     messages = [
         SystemMessage(content=EPISODE_SCRIPTER_SYSTEM),
-        HumanMessage(
-            content=EPISODE_SCRIPTER_HUMAN.format(planner_json=planner_json)
-        ),
+        HumanMessage(content=EPISODE_SCRIPTER_HUMAN.format(planner_json=planner_json)),
     ]
 
-    result: EpisodeScripts = model.invoke(messages)
+    result = model.invoke(messages)
 
     return {"episode_scripts": result}

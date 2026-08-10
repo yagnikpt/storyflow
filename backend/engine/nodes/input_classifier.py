@@ -33,7 +33,7 @@ def input_classifier_node(state: EpisodeEngineState) -> dict:
         HumanMessage(content=INPUT_CLASSIFIER_HUMAN.format(task=raw_input)),
     ]
 
-    result: InputClassification = model.invoke(messages)
+    result = model.invoke(messages)
 
     return {"input_classification": result}
 
@@ -47,6 +47,9 @@ def story_validator_node(state: EpisodeEngineState) -> dict:
     model = get_model().with_structured_output(StoryValidation)
 
     expanded_story = state["expanded_story"]
+    if not expanded_story:
+        return {"story_validation": None}
+
     story_text = expanded_story.model_dump_json(indent=2)
 
     messages = [
@@ -54,7 +57,7 @@ def story_validator_node(state: EpisodeEngineState) -> dict:
         HumanMessage(content=STORY_VALIDATOR_HUMAN.format(expanded_story=story_text)),
     ]
 
-    result: StoryValidation = model.invoke(messages)
+    result = model.invoke(messages)
 
     updates: dict = {
         "story_validation": result,

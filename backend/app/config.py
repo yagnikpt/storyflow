@@ -17,12 +17,10 @@ class Settings(BaseSettings):
     # Database
     database_url: str = "postgresql://postgres:postgres@localhost:5432/vplayer"
 
-    # Vertex AI / Gemini
-    google_cloud_project: str = ""
-    google_cloud_location: str = "us-central1"
-    vertex_generation_model: str = "gemini-2.5-flash"
-    google_genai_use_vertex: str = ""
-    gcp_service_account_json: str = ""
+    # Ai provider
+    ai_provider: str = ""
+    ai_provider_api_key: str = ""
+    ai_model: str = ""
 
     static_dir: str = ""
 
