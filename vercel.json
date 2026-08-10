@@ -1,0 +1,9 @@
+{
+	"services": {
+		"main": {
+			"root": ".",
+			"entrypoint": "Dockerfile"
+		}
+	},
+	"rewrites": [{ "source": "/(.*)", "destination": "/main" }]
+}
