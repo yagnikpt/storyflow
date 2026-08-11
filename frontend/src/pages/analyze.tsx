@@ -347,7 +347,7 @@ export function Pipeline({
 
 function Score({ value, outOf = 10 }: { value: number; outOf?: number }) {
 	return (
-		<span className="tabular font-semibold text-ink">
+		<span className="tabular text-sm font-semibold text-ink">
 			{value}
 			<span className="font-normal text-muted-foreground">/{outOf}</span>
 		</span>
@@ -366,7 +366,7 @@ function Details({
 			<AccordionTrigger className="rounded-none items-center font-semibold hover:no-underline **:data-[slot=accordion-trigger-icon]:text-coral">
 				{summary}
 			</AccordionTrigger>
-			<AccordionContent className="pb-5">{children}</AccordionContent>
+			<AccordionContent className="pb-6">{children}</AccordionContent>
 		</AccordionItem>
 	);
 }
@@ -382,26 +382,8 @@ function RiskBadge({ level }: { level: string }) {
 }
 
 function Results({ result, onReset }: { result: Result; onReset: () => void }) {
-	const scripts = new Map(
-		result.episode_scripts.scripts.map((item) => [item.episode_number, item]),
-	);
-	const emotions = new Map(
-		result.emotional_arc.episodes.map((item) => [item.episode_number, item]),
-	);
-	const retention = new Map(
-		result.retention_analysis.episodes.map((item) => [
-			item.episode_number,
-			item,
-		]),
-	);
-	const cliffhangers = new Map(
-		result.cliffhanger_analysis.scores.map((item) => [
-			item.episode_number,
-			item,
-		]),
-	);
 	return (
-		<div className="space-y-8">
+		<div className="space-y-8 md:space-y-14">
 			<div className="flex flex-wrap items-end justify-between gap-4">
 				<div className="min-w-0">
 					<p className="text-[11px] font-bold tracking-[.16em] text-blue uppercase">
@@ -428,7 +410,7 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 					New analysis
 				</button>
 			</div>
-			<div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-4">
+			<div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border grid-cols-2 sm:grid-cols-4">
 				{[
 					[
 						"Quality",
@@ -444,33 +426,29 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 						`${result.cliffhanger_analysis.average_score}/10`,
 					],
 				].map(([label, value]) => (
-					<div className="bg-card p-4" key={String(label)}>
-						<p className="text-[10px] font-bold tracking-[.12em] text-muted-foreground uppercase">
+					<div
+						className="bg-card p-5 sm:p-6 flex flex-col justify-between"
+						key={String(label)}
+					>
+						<p className="text-xs font-bold tracking-[.12em] text-muted-foreground uppercase">
 							{label}
 						</p>
-						<p className="font-display tabular mt-2 text-3xl">{value}</p>
+						<p className="font-display tabular text-4xl mt-3">{value}</p>
 					</div>
 				))}
 			</div>
-			<section className="grid gap-7 xl:grid-cols-[1.45fr_.85fr]">
+			<section className="grid gap-8 xl:grid-cols-[1.45fr_.85fr]">
 				<div className="rounded-xl border border-border bg-card">
-					<div className="border-b border-border p-5">
-						<p className="text-[11px] font-bold tracking-[.14em] text-coral uppercase">
+					<div className="border-b border-border p-6 sm:p-7">
+						<p className="text-xs font-bold tracking-[.14em] text-coral uppercase">
 							The episode ribbon
 						</p>
-						<h3 className="font-display mt-1 text-balance text-3xl">
+						<h3 className="font-display mt-2 text-balance text-3xl">
 							{result.episode_planner.overall_narrative_arc}
 						</h3>
 					</div>
 					{result.episode_planner.episodes.map((episode) => (
-						<EpisodeCard
-							key={episode.episode_number}
-							plan={episode}
-							script={scripts.get(episode.episode_number)}
-							emotion={emotions.get(episode.episode_number)}
-							retention={retention.get(episode.episode_number)}
-							cliffhanger={cliffhangers.get(episode.episode_number)}
-						/>
+						<EpisodeCard key={episode.episode_number} plan={episode} />
 					))}
 				</div>
 				<aside className="space-y-5">
@@ -533,7 +511,7 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 					</div>
 				</aside>
 			</section>
-			<section className="grid gap-7 xl:grid-cols-2">
+			<section className="grid gap-8 xl:grid-cols-2">
 				<InsightPanel
 					title="Retention diagnosis"
 					eyebrow="Where viewers may leave"
@@ -545,7 +523,7 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 									key={episode.episode_number}
 									summary={`Episode ${episode.episode_number} · ${episode.overall_retention_score}% predicted retention`}
 								>
-									<div className="mb-4 flex gap-5 text-xs text-muted-foreground">
+									<div className="mb-5 flex gap-6 text-xs text-muted-foreground">
 										<span>
 											Hook <Score value={episode.hook_strength} />
 										</span>
@@ -553,10 +531,10 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 											Pacing <Score value={episode.pacing_score} />
 										</span>
 									</div>
-									<div className="space-y-3">
+									<div className="space-y-4">
 										{episode.risk_zones.map((risk) => (
 											<div
-												className="rounded-lg bg-muted/70 p-3"
+												className="rounded-lg bg-muted/70 p-4"
 												key={risk.timestamp_range}
 											>
 												<div className="flex items-center justify-between gap-3">
@@ -565,10 +543,10 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 													</span>
 													<RiskBadge level={risk.risk_level} />
 												</div>
-												<p className="mt-2 text-xs leading-5 text-muted-foreground">
+												<p className="mt-3 text-xs leading-6 text-muted-foreground">
 													{risk.reason}
 												</p>
-												<p className="mt-2 border-l-2 border-blue pl-2 text-xs leading-5">
+												<p className="mt-3 border-l-2 border-blue pl-3 text-xs leading-6">
 													<b>Cut note:</b> {risk.suggested_fix}
 												</p>
 											</div>
@@ -593,12 +571,12 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 									key={score.episode_number}
 									summary={`Episode ${score.episode_number} · ${score.cliffhanger_type} · ${score.score}/10`}
 								>
-									<div className="grid grid-cols-3 gap-2 text-center text-xs">
+									<div className="grid grid-cols-3 gap-3 text-center text-xs">
 										<Metric label="Curiosity" value={score.curiosity_gap} />
 										<Metric label="Stakes" value={score.stakes_level} />
 										<Metric label="Charge" value={score.emotional_charge} />
 									</div>
-									<p className="mt-4 text-xs leading-5 text-muted-foreground">
+									<p className="mt-5 text-xs leading-6 text-muted-foreground">
 										{score.reasoning}
 									</p>
 								</Details>
@@ -607,7 +585,7 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 					</div>
 				</InsightPanel>
 			</section>
-			<section className="grid gap-7 xl:grid-cols-[.8fr_1.2fr]">
+			<section className="grid gap-8 xl:grid-cols-[.8fr_1.2fr]">
 				<InsightPanel
 					title="Emotional beat sheet"
 					eyebrow={`Coherence ${result.emotional_arc.emotional_coherence_score}/10`}
@@ -619,19 +597,21 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 									key={episode.episode_number}
 									summary={`Episode ${episode.episode_number} · ${episode.dominant_emotion}`}
 								>
-									<div className="mb-3 text-xs text-muted-foreground">
+									<div className="mb-4 text-xs text-muted-foreground">
 										Range <Score value={episode.emotional_range} />
 									</div>
-									<div className="space-y-2">
+									<div className="space-y-3">
 										{episode.emotion_beats.map((beat) => (
 											<div
-												className="grid grid-cols-[55px_1fr_auto] items-center gap-3 text-xs"
+												className="grid grid-cols-[60px_1fr_auto] items-baseline gap-4 border-b border-border pb-3 text-xs last:border-0 last:pb-0"
 												key={beat.timestamp_range}
 											>
 												<span className="tabular text-muted-foreground">
 													{beat.timestamp_range}
 												</span>
-												<span className="capitalize">{beat.emotion}</span>
+												<span className="capitalize text-sm">
+													{beat.emotion}
+												</span>
 												<Score value={beat.intensity} />
 											</div>
 										))}
@@ -647,7 +627,7 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 				>
 					{result.optimization_report.suggestions.map((suggestion, index) => (
 						<article
-							className="border-t border-border py-4 first:border-t-0"
+							className="border-t border-border py-5 first:border-t-0"
 							key={`${suggestion.episode_number}-${suggestion.category}`}
 						>
 							<div className="flex flex-wrap items-center gap-2">
@@ -657,18 +637,18 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 								<span className="text-xs font-semibold">
 									Episode {suggestion.episode_number}
 								</span>
-								<span className="rounded-full bg-secondary px-2 py-1 text-[10px] font-bold tracking-widest text-blue uppercase">
+								<span className="rounded-full bg-secondary px-2 py-1 text-xs font-bold tracking-widest text-blue uppercase">
 									{suggestion.category}
 								</span>
 								<RiskBadge level={suggestion.priority} />
 							</div>
-							<p className="mt-3 text-xs leading-5 text-muted-foreground">
+							<p className="mt-4 text-xs leading-6 text-muted-foreground">
 								<b className="text-ink">Issue:</b> {suggestion.current_issue}
 							</p>
-							<p className="mt-2 border-l-2 border-coral pl-3 text-xs leading-5">
+							<p className="mt-3 border-l-2 border-coral pl-3 text-xs leading-6">
 								<b>Make this change:</b> {suggestion.suggested_improvement}
 							</p>
-							<p className="mt-2 text-xs leading-5 text-muted-foreground">
+							<p className="mt-3 text-xs leading-6 text-muted-foreground">
 								<b className="text-ink">Expected impact:</b>{" "}
 								{suggestion.expected_impact}
 							</p>
@@ -676,11 +656,11 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 					))}
 				</InsightPanel>
 			</section>
-			<section className="rounded-xl border border-border bg-card p-5">
-				<p className="text-[11px] font-bold tracking-[.14em] text-blue uppercase">
+			<section className="rounded-xl border border-border bg-card p-6 sm:p-7">
+				<p className="text-xs font-bold tracking-[.14em] text-blue uppercase">
 					Script package
 				</p>
-				<h3 className="font-display mt-1 text-3xl">
+				<h3 className="font-display mt-2 text-3xl">
 					{result.episode_scripts.total_word_count.toLocaleString()} words,
 					built to flow as one.
 				</h3>
@@ -694,16 +674,16 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 								key={script.episode_number}
 								summary={`Episode ${script.episode_number} · ${script.title} · ${script.word_count} words`}
 							>
-								<div className="space-y-5">
-									<p className="whitespace-pre-wrap text-sm leading-7 text-ink/85">
+								<div className="space-y-7">
+									<p className="whitespace-pre-wrap text-sm leading-loose text-ink/85">
 										{script.script}
 									</p>
-									<div className="grid gap-5 md:grid-cols-2">
+									<div className="grid gap-6 border-t border-border pt-6 md:grid-cols-2">
 										<div>
-											<p className="text-[10px] font-bold tracking-[.12em] text-coral uppercase">
+											<p className="text-xs font-bold tracking-[.12em] text-coral uppercase">
 												Vertical direction
 											</p>
-											<ul className="mt-2 space-y-2 text-xs leading-5 text-muted-foreground">
+											<ul className="mt-3 space-y-3 text-xs leading-6 text-muted-foreground">
 												{script.scene_directions.map((direction) => (
 													<li className="flex gap-2" key={direction}>
 														<span className="text-coral">•</span>
@@ -713,10 +693,10 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 											</ul>
 										</div>
 										<div>
-											<p className="text-[10px] font-bold tracking-[.12em] text-coral uppercase">
+											<p className="text-xs font-bold tracking-[.12em] text-coral uppercase">
 												Continuity note
 											</p>
-											<p className="mt-2 text-xs leading-5 text-muted-foreground">
+											<p className="mt-3 text-xs leading-6 text-muted-foreground">
 												{script.continuity_notes}
 											</p>
 										</div>
@@ -734,77 +714,27 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 	);
 }
 
-function EpisodeCard({
-	plan,
-	script,
-	emotion,
-	retention,
-	cliffhanger,
-}: {
-	plan: EpisodePlan;
-	script?: Result["episode_scripts"]["scripts"][number];
-	emotion?: Result["emotional_arc"]["episodes"][number];
-	retention?: Result["retention_analysis"]["episodes"][number];
-	cliffhanger?: Result["cliffhanger_analysis"]["scores"][number];
-}) {
+function EpisodeCard({ plan }: { plan: EpisodePlan }) {
 	return (
-		<article className="grid grid-cols-[42px_1fr] gap-3 border-b border-border p-5 last:border-0">
+		<article className="grid md:grid-cols-[48px_1fr] gap-4 border-b border-border p-6 last:border-0">
 			<span className="font-display text-2xl italic text-coral">
 				{String(plan.episode_number).padStart(2, "0")}
 			</span>
 			<div className="min-w-0">
-				<div className="flex flex-wrap items-baseline justify-between gap-2">
-					<h4 className="text-sm font-bold">{plan.title}</h4>
-					<span className="tabular text-[11px] text-muted-foreground">
-						~{plan.estimated_word_count} words
-					</span>
-				</div>
-				<p className="mt-2 text-sm leading-6 text-muted-foreground">
+				<h4 className="text-sm font-bold leading-snug">{plan.title}</h4>
+				<p className="mt-2 text-sm leading-7 text-muted-foreground">
 					{plan.outline}
 				</p>
-				<div className="mt-3 grid gap-3 text-xs md:grid-cols-2">
-					<p>
-						<b>Emotional move:</b> {plan.emotional_arc_notes}
-					</p>
-					<p className="border-l-2 border-coral pl-3">
-						<b>End on:</b> {plan.cliffhanger_idea}
-					</p>
-				</div>
-				<div className="mt-3 flex flex-wrap gap-2">
-					{plan.retention_hooks.map((hook) => (
-						<span
-							className="rounded-full bg-secondary px-2.5 py-1 text-[11px] text-ink/75"
-							key={hook}
-						>
-							{hook}
-						</span>
-					))}
-				</div>
-				{(script || emotion || retention || cliffhanger) && (
-					<div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-border pt-3 text-xs text-muted-foreground sm:grid-cols-4">
-						{script && (
-							<span>
-								Script{" "}
-								<Score
-									value={script.word_count}
-									outOf={plan.estimated_word_count}
-								/>
+				{plan.retention_hooks.length > 0 && (
+					<div className="mt-4 flex flex-wrap gap-2">
+						{plan.retention_hooks.map((hook) => (
+							<span
+								className="rounded-md bg-secondary px-2.5 py-1 text-xs text-ink/75"
+								key={hook}
+							>
+								{hook}
 							</span>
-						)}
-						{emotion && (
-							<span className="capitalize">{emotion.dominant_emotion}</span>
-						)}
-						{retention && (
-							<span>
-								Retention{" "}
-								<Score value={retention.overall_retention_score} outOf={100} />
-							</span>
-						)}
-						{cliffhanger && (
-							<span>
-								Hook <Score value={cliffhanger.score} />
-							</span>
-						)}
+						))}
 					</div>
 				)}
 			</div>
@@ -822,20 +752,20 @@ function InsightPanel({
 	children: React.ReactNode;
 }) {
 	return (
-		<section className="rounded-xl border border-border bg-card p-5">
-			<p className="text-[10px] font-bold tracking-[.14em] text-coral uppercase">
+		<section className="rounded-xl border border-border bg-card p-6 sm:p-7">
+			<p className="text-xs font-bold tracking-[.14em] text-coral uppercase">
 				{eyebrow}
 			</p>
-			<h3 className="font-display mt-1 text-3xl">{title}</h3>
-			<div className="mt-4">{children}</div>
+			<h3 className="font-display mt-2 text-3xl">{title}</h3>
+			<div className="mt-5">{children}</div>
 		</section>
 	);
 }
 
 function Metric({ label, value }: { label: string; value: number }) {
 	return (
-		<div className="rounded-lg bg-muted p-2">
-			<p className="text-[10px] text-muted-foreground">{label}</p>
+		<div className="rounded-lg bg-muted p-3">
+			<p className="text-xs text-muted-foreground">{label}</p>
 			<Score value={value} />
 		</div>
 	);

@@ -86,7 +86,75 @@ START → [A0] Input Classifier
 - **Story loop** (A1↔A2): max 3 retries, controlled by `_should_retry_story()` in `graph.py`.
 - **Pipeline loop** (A3→A8): max `max_revisions` retries, controlled by `_should_replan()` in `graph.py`.
 
-### Nodes
+### Analyze (Synchronous)
+
+```bash
+POST /episodic-intelligence/analyze
+```
+
+Runs the full pipeline and returns the result when complete. Blocks for 1-3 minutes depending on story complexity.
+
+**Request body:**
+
+```json
+{
+  "story_idea": "A lonely astronaut discovers alien music on Mars",
+  "genre": "sci-fi",
+  "target_audience": "18-30 mobile-first viewers",
+  "tone": "mysterious",
+  "episode_count_preference": 6,
+  "max_revisions": 2
+}
+```
+
+| Field                      | Type   | Required | Default                        |
+| -------------------------- | ------ | -------- | ------------------------------ |
+| `story_idea`               | string | Yes      | -                              |
+| `genre`                    | string | No       | `""`                           |
+| `target_audience`          | string | No       | `"18-30 mobile-first viewers"` |
+| `tone`                     | string | No       | `""`                           |
+| `episode_count_preference` | int    | No       | `6` (range: 5-8)               |
+| `max_revisions`            | int    | No       | `2` (range: 1-5)               |
+
+**Response body:** See [AnalyzeResponse](#analyzeresponse) schema.
+
+### Analyze (Streaming)
+
+```bash
+POST /episodic-intelligence/analyze/stream
+```
+
+Real-time SSE streaming endpoint. Same request body as the synchronous endpoint.
+
+**SSE event types:**
+
+| Event      | Payload                                              | Description                                                                                         |
+| ---------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `progress` | `{"node": "<name>", "status": "started\|completed"}` | Node execution lifecycle                                                                            |
+| `thinking` | `{"node": "<name>", "text": "<thinking content>"}`   | LLM chain-of-thought reasoning (requires `include_thoughts=True` in LLM config; currently disabled) |
+| `complete` | Full `AnalyzeResponse` JSON                          | Pipeline finished successfully                                                                      |
+| `error`    | `{"detail": "<error message>"}`                      | Pipeline failed                                                                                     |
+
+### AnalyzeResponse
+
+```json
+{
+  "run_id": "uuid",
+  "story_idea": "string",
+  "revisions_completed": 0,
+  "episode_planner": { ... },
+  "episode_scripts": { ... },
+  "emotional_arc": { ... },
+  "retention_analysis": { ... },
+  "cliffhanger_analysis": { ... },
+  "optimization_report": { ... },
+  "created_at": "ISO 8601 timestamp"
+}
+```
+
+Defined in `backend/app/schemas.py:56-70`.
+
+### Node Details
 
 | ID  | Node             | File                                   | Notes                                               |
 | --- | ---------------- | -------------------------------------- | --------------------------------------------------- |
@@ -101,9 +169,15 @@ START → [A0] Input Classifier
 | A8  | Final Validator  | `nodes/final_validator.py`             | Avg score ≥ 7 passes; triggers replan otherwise     |
 | —   | Optimizer        | `nodes/optimizer.py`                   | Advisory suggestions only, no feedback loop         |
 
-### LLM Factory
+### Feedback Loops
 
-`backend/engine/llm.py` — uses `langchain.init_chat_model(f"{AI_PROVIDER}:{AI_MODEL}")` with the API key from `AI_PROVIDER_API_KEY`. Temperature = 0 (deterministic). All nodes also do a `None` guard on upstream state before invoking the model to prevent cascading failures.
+1. **Story Validation Loop (A1 <-> A2):** If the expanded story scores below 8, it loops back to the Story Expander with specific feedback. Maximum 3 retries. Controlled by `_should_retry_story()` at `engine/graph.py`.
+
+2. **Pipeline Revision Loop (A3 -> A8):** If the Final Validator's average score is below 7, the pipeline replans from Episode Planner. Maximum retries controlled by `max_revisions` (default 2). Controlled by `_should_replan()` at `engine/graph.py`.
+
+### Parallelism
+
+Nodes A5 (Emotional Arc Scorer) and A6 (Cliffhanger Scorer) execute in parallel within a single LangGraph superstep. Both must complete before A7 starts. Defined at `engine/graph.py`.
 
 ---
 

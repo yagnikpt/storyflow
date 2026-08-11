@@ -41,7 +41,6 @@ from typing import Literal
 
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
-from langgraph.graph.state import CompiledStateGraph
 
 from engine.nodes.cliffhanger_strength_scorer import cliffhanger_strength_scorer_node
 from engine.nodes.emotional_arc_scorer import emotional_arc_scorer_node
@@ -53,7 +52,6 @@ from engine.nodes.optimizer import optimizer_node
 from engine.nodes.retention_risk_analyzer import retention_risk_analyzer_node
 from engine.nodes.story_expander import story_expander_node
 from engine.state import EpisodeEngineState
-
 
 # ---------------------------------------------------------------------------
 # Conditional edge functions
@@ -107,7 +105,7 @@ def _should_replan(
 # ---------------------------------------------------------------------------
 
 
-def build_graph(checkpointer: InMemorySaver | None = None) -> CompiledStateGraph:
+def build_graph(checkpointer: InMemorySaver | None = None):
     """Construct and compile the Episodic Intelligence Engine graph.
 
     Args:
@@ -123,16 +121,18 @@ def build_graph(checkpointer: InMemorySaver | None = None) -> CompiledStateGraph
     builder = StateGraph(EpisodeEngineState)
 
     # --- Register all nodes ---
-    builder.add_node("input_classifier", input_classifier_node)       # A0
-    builder.add_node("story_expander", story_expander_node)           # A1
-    builder.add_node("story_validator", story_validator_node)         # A2
-    builder.add_node("episode_planner", episode_planner_node)         # A3
-    builder.add_node("episode_scripter", episode_scripter_node)       # A4
-    builder.add_node("emotional_arc_scorer", emotional_arc_scorer_node)           # A5
-    builder.add_node("cliffhanger_strength_scorer", cliffhanger_strength_scorer_node)  # A6
-    builder.add_node("retention_risk_analyzer", retention_risk_analyzer_node)      # A7
-    builder.add_node("final_validator", final_validator_node)         # A8
-    builder.add_node("optimizer", optimizer_node)                     # Recommendations
+    builder.add_node("input_classifier", input_classifier_node)  # A0
+    builder.add_node("story_expander", story_expander_node)  # A1
+    builder.add_node("story_validator", story_validator_node)  # A2
+    builder.add_node("episode_planner", episode_planner_node)  # A3
+    builder.add_node("episode_scripter", episode_scripter_node)  # A4
+    builder.add_node("emotional_arc_scorer", emotional_arc_scorer_node)  # A5
+    builder.add_node(
+        "cliffhanger_strength_scorer", cliffhanger_strength_scorer_node
+    )  # A6
+    builder.add_node("retention_risk_analyzer", retention_risk_analyzer_node)  # A7
+    builder.add_node("final_validator", final_validator_node)  # A8
+    builder.add_node("optimizer", optimizer_node)  # Recommendations
 
     # --- Entry ---
     builder.add_edge(START, "input_classifier")

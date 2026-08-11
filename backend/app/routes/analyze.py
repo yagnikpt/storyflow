@@ -8,14 +8,16 @@ import uuid
 from collections.abc import AsyncIterator
 from datetime import datetime, timezone
 
+from engine.graph import build_graph
+from engine.state import EpisodeEngineState
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
+from langchain_core.runnables import RunnableConfig
 from sqlalchemy.orm import Session
 
 from app.db import get_db
 from app.models import AnalysisRun
 from app.schemas import AnalyzeRequest, AnalyzeResponse
-from engine.graph import build_graph
 
 logger = logging.getLogger(__name__)
 
@@ -41,21 +43,29 @@ def _build_task_string(request: AnalyzeRequest) -> str:
     return "\n".join(task_parts)
 
 
-def _build_initial_state(request: AnalyzeRequest) -> dict:
+def _build_initial_state(request: AnalyzeRequest) -> EpisodeEngineState:
     """Build the initial LangGraph state dict from a request."""
-    return {
+    state: EpisodeEngineState = {
         "task": _build_task_string(request),
+        "input_classification": None,
+        "expanded_story": None,
+        "story_validation": None,
+        "story_validation_feedback": "",
         "episode_planner": None,
+        "episode_scripts": None,
         "emotional_arc": None,
         "retention_analysis": None,
         "cliffhanger_analysis": None,
+        "final_validation": None,
+        "final_validation_feedback": "",
         "optimization_report": None,
-        # Loop controls — wire the user's max_revisions to both loops
         "story_revision_number": 1,
         "max_story_revisions": request.max_revisions,
         "pipeline_revision_number": 1,
         "max_pipeline_revisions": request.max_revisions,
     }
+
+    return state
 
 
 def _serialize_state_value(val: object) -> object:
@@ -129,7 +139,7 @@ def analyze_story(
     initial_state = _build_initial_state(request)
 
     thread_id = str(uuid.uuid4())
-    config = {"configurable": {"thread_id": thread_id}}
+    config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
 
     logger.info(
         "Starting analysis for story=%r  max_revisions=%d  thread=%s",
@@ -244,7 +254,7 @@ async def analyze_story_stream(
 
     initial_state = _build_initial_state(request)
     thread_id = str(uuid.uuid4())
-    config = {"configurable": {"thread_id": thread_id}}
+    config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
 
     logger.info(
         "Starting streaming analysis for story=%r  max_revisions=%d  thread=%s",

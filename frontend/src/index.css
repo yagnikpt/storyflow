@@ -64,7 +64,7 @@
 html { scroll-behavior: smooth; -webkit-tap-highlight-color: #2456d722; }
 body { touch-action: manipulation; }
 button, input, textarea, select { font: inherit; }
-button { cursor: pointer; }
+/*button { cursor: pointer; }*/
 a, button, input, textarea { -webkit-tap-highlight-color: transparent; }
 ::selection { background: #b8c9f6; color: #112844; }
 

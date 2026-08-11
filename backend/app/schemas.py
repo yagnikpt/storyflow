@@ -5,8 +5,6 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, Field
-
 from engine.state import (
     CliffhangerAnalysis,
     EmotionalArc,
@@ -15,7 +13,7 @@ from engine.state import (
     OptimizationReport,
     RetentionAnalysis,
 )
-
+from pydantic import BaseModel, Field
 
 # ---------------------------------------------------------------------------
 # Request
@@ -41,7 +39,7 @@ class AnalyzeRequest(BaseModel):
         description="Preferred number of episodes (5-8)",
     )
     max_revisions: int = Field(
-        default=2,
+        default=1,
         ge=1,
         le=5,
         description="Number of optimization revision loops (1-5)",
