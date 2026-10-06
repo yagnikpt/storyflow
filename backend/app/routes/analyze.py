@@ -7,9 +7,11 @@ import logging
 import uuid
 from collections.abc import AsyncIterator
 from datetime import datetime, timezone
+from typing import Annotated
 
 from engine.graph import build_graph
 from engine.state import EpisodeEngineState
+from engine.tone_presets import TONE_PRESET_PARAMS
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from langchain_core.runnables import RunnableConfig
@@ -30,12 +32,12 @@ _graph = build_graph()
 def _build_task_string(request: AnalyzeRequest) -> str:
     """Build the task string from the request fields."""
     task_parts: list[str] = [request.story_idea]
-    if request.genre:
-        task_parts.append(f"Genre: {request.genre}")
     if request.target_audience:
         task_parts.append(f"Target audience: {request.target_audience}")
     if request.tone:
         task_parts.append(f"Tone: {request.tone}")
+    if request.tone_preset != "custom":
+        task_parts.append(TONE_PRESET_PARAMS[request.tone_preset])
     if request.episode_count_preference:
         task_parts.append(
             f"Preferred episode count: {request.episode_count_preference}"
@@ -227,7 +229,7 @@ def _extract_thinking(content: str | list[dict]) -> str | None:  # type: ignore[
 async def analyze_story_stream(
     request: AnalyzeRequest,
     http_request: Request,
-    db: Session = Depends(get_db),
+    db: Annotated[Session, Depends(get_db)],
 ) -> StreamingResponse:
     """Stream the analysis pipeline as Server-Sent Events.
 

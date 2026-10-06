@@ -13,6 +13,7 @@ from engine.state import (
     OptimizationReport,
     RetentionAnalysis,
 )
+from engine.tone_presets import TonePreset
 from pydantic import BaseModel, Field
 
 # ---------------------------------------------------------------------------
@@ -26,12 +27,15 @@ class AnalyzeRequest(BaseModel):
     story_idea: str = Field(
         ..., description="The raw story idea to analyze", min_length=1
     )
-    genre: str = Field(default="", description="Genre hint (e.g. thriller, romance)")
     target_audience: str = Field(
         default="18-30 mobile-first viewers",
         description="Target audience description",
     )
-    tone: str = Field(default="", description="Desired tone (e.g. tense, humorous)")
+    tone: str = Field(default="", description="Optional custom tone instruction")
+    tone_preset: TonePreset = Field(
+        default="thriller",
+        description="Creative preset: comedic, dark, romantic, thriller, or custom",
+    )
     episode_count_preference: int = Field(
         default=6,
         ge=5,

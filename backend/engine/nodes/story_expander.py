@@ -37,20 +37,6 @@ def story_expander_node(state: EpisodeEngineState) -> dict:
     feedback = state.get("story_validation_feedback", "")
     revision = state.get("story_revision_number", 1)
 
-    # load optional inspirational context from the engine/context directory
-    # the prompt constant now includes a ``{Context}`` placeholder that must be
-    # filled before sending to the LLM. If the file doesn't exist we just pass an
-    # empty string so the prompt remains valid.
-    from pathlib import Path
-
-    context_path = Path(__file__).parent.parent / "context" / "The_Yellow_Wallpaper.txt"
-    try:
-        context_text = context_path.read_text(encoding="utf-8")
-    except FileNotFoundError:
-        context_text = ""
-
-    system_prompt = STORY_EXPANDER_SYSTEM.format(Context=context_text)
-
     if feedback and revision > 1:
         human_content = STORY_EXPANDER_REVISION_HUMAN.format(
             task=task,
@@ -64,7 +50,7 @@ def story_expander_node(state: EpisodeEngineState) -> dict:
         )
 
     messages = [
-        SystemMessage(content=system_prompt),
+        SystemMessage(content=STORY_EXPANDER_SYSTEM),
         HumanMessage(content=human_content),
     ]
 

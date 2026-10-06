@@ -99,22 +99,48 @@ Runs the full pipeline and returns the result when complete. Blocks for 1-3 minu
 ```json
 {
   "story_idea": "A lonely astronaut discovers alien music on Mars",
-  "genre": "sci-fi",
   "target_audience": "18-30 mobile-first viewers",
-  "tone": "mysterious",
+  "tone_preset": "thriller",
   "episode_count_preference": 6,
-  "max_revisions": 2
+  "max_revisions": 1
 }
 ```
 
 | Field                      | Type   | Required | Default                        |
 | -------------------------- | ------ | -------- | ------------------------------ |
 | `story_idea`               | string | Yes      | -                              |
-| `genre`                    | string | No       | `""`                           |
 | `target_audience`          | string | No       | `"18-30 mobile-first viewers"` |
 | `tone`                     | string | No       | `""`                           |
+| `tone_preset`              | string | No       | `"thriller"` — `comedic`, `dark`, `romantic`, `thriller`, or `custom` |
 | `episode_count_preference` | int    | No       | `6` (range: 5-8)               |
-| `max_revisions`            | int    | No       | `2` (range: 1-5)               |
+| `max_revisions`            | int    | No       | `1` (range: 1-5)               |
+
+### Tone presets
+
+The client provides four one-click creative controls rather than asking creators to
+invent prompt wording. Each is resolved server-side into production instructions so
+API and UI requests behave consistently:
+
+| Preset | Direction |
+| ------ | --------- |
+| `comedic` | Conversational humour, escalating awkwardness, warm payoff |
+| `dark` | Moral pressure, restraint, consequence, unsettling reversals |
+| `romantic` | Mutual agency, earned chemistry, vulnerability |
+| `thriller` | Immediate pressure, fair clues, causal escalation, sharp reversals |
+| `custom` | Uses the creator's own tone direction instead of a preset |
+
+The prompt layer is designed for Indian creators without flattening audiences into a
+single voice: it uses local context or language only when the story calls for it and
+does not use Hinglish, region, caste, religion, class, or gender as a stereotype.
+
+### PDF exports
+
+Completed results provide two PDF export actions through the browser print dialog:
+
+- **Scripts PDF** includes the episode scripts, vertical direction, and continuity notes.
+- **All data PDF** includes the episode plan, scripts, emotional throughline, retention diagnosis, and optimization notes.
+
+Choose **Save as PDF** in the dialog to download either export.
 
 **Response body:** See [AnalyzeResponse](#analyzeresponse) schema.
 
@@ -173,7 +199,7 @@ Defined in `backend/app/schemas.py:56-70`.
 
 1. **Story Validation Loop (A1 <-> A2):** If the expanded story scores below 8, it loops back to the Story Expander with specific feedback. Maximum 3 retries. Controlled by `_should_retry_story()` at `engine/graph.py`.
 
-2. **Pipeline Revision Loop (A3 -> A8):** If the Final Validator's average score is below 7, the pipeline replans from Episode Planner. Maximum retries controlled by `max_revisions` (default 2). Controlled by `_should_replan()` at `engine/graph.py`.
+2. **Pipeline Revision Loop (A3 -> A8):** If the Final Validator's average score is below 7, the pipeline replans from Episode Planner. Maximum retries controlled by `max_revisions` (default 1). Controlled by `_should_replan()` at `engine/graph.py`.
 
 ### Parallelism
 
@@ -208,11 +234,11 @@ SSE streaming. Same request body. Emits:
 | Field                      | Type   | Default                        |
 | -------------------------- | ------ | ------------------------------ |
 | `story_idea`               | string | _(required)_                   |
-| `genre`                    | string | `""`                           |
 | `target_audience`          | string | `"18-30 mobile-first viewers"` |
 | `tone`                     | string | `""`                           |
+| `tone_preset`              | string | `"thriller"` — or `custom` with `tone` |
 | `episode_count_preference` | int    | `6` (range 5–8)                |
-| `max_revisions`            | int    | `2` (range 1–5)                |
+| `max_revisions`            | int    | `1` (range 1–5)                |
 
 ---
 

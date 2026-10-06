@@ -62,7 +62,7 @@ just frontend   # http://localhost:5173
   "genre": "thriller",
   "tone": "tense",
   "episode_count_preference": 6,
-  "max_revisions": 2
+  "max_revisions": 1
 }
 ```
 

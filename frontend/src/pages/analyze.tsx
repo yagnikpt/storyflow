@@ -3,6 +3,7 @@ import {
 	ArrowUpRight,
 	Check,
 	Clapperboard,
+	Download,
 	LoaderCircle,
 	Sparkles,
 } from "lucide-react";
@@ -18,6 +19,16 @@ import {
 	AccordionTrigger,
 } from "@/components/ui/accordion";
 import type { EpisodePlan, Progress, Result } from "@/lib/types";
+import { exportPdf } from "@/lib/pdf-export";
+
+const tonePresets = [
+	{ value: "comedic", label: "Comedic", description: "Warm, sharp reversals" },
+	{ value: "dark", label: "Dark", description: "Dread and consequence" },
+	{ value: "romantic", label: "Romantic", description: "Chemistry and longing" },
+	{ value: "thriller", label: "Thriller", description: "Urgency and reveals" },
+	{ value: "custom", label: "Custom", description: "Write your own direction" },
+] as const;
+type TonePreset = (typeof tonePresets)[number]["value"];
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
 const nodes = [
@@ -47,8 +58,8 @@ const labels: Record<string, string> = {
 
 export default function AnalyzePage() {
 	const [idea, setIdea] = useState("");
-	const [genre, setGenre] = useState("Thriller");
-	const [tone, setTone] = useState("Tense");
+	const [tonePreset, setTonePreset] = useState<TonePreset>("thriller");
+	const [customTone, setCustomTone] = useState("");
 	const [episodes, setEpisodes] = useState(6);
 	const [progress, setProgress] = useState<Progress[]>([]);
 	const [result, setResult] = useState<Result | null>(null);
@@ -70,10 +81,10 @@ export default function AnalyzePage() {
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
 						story_idea: idea,
-						genre,
-						tone,
+						tone: tonePreset === "custom" ? customTone : "",
+						tone_preset: tonePreset,
 						episode_count_preference: episodes,
-						max_revisions: 2,
+						max_revisions: 1,
 					}),
 				},
 			);
@@ -161,27 +172,12 @@ export default function AnalyzePage() {
 								className="mt-2 min-h-36 w-full resize-y rounded-lg border border-input bg-background p-3.5 text-sm leading-6 outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
 							/>
 						</label>
-						<div className="grid grid-cols-2 gap-3">
-							<label className="text-sm font-semibold">
-								Genre
-								<input
-									name="genre"
-									autoComplete="off"
-									value={genre}
-									onChange={(event) => setGenre(event.target.value)}
-									className="mt-2 w-full rounded-lg border border-input bg-background p-3 text-sm font-normal outline-none focus:border-ring"
-								/>
-							</label>
-							<label className="text-sm font-semibold">
-								Tone
-								<input
-									name="tone"
-									autoComplete="off"
-									value={tone}
-									onChange={(event) => setTone(event.target.value)}
-									className="mt-2 w-full rounded-lg border border-input bg-background p-3 text-sm font-normal outline-none focus:border-ring"
-								/>
-							</label>
+						<div>
+							<p className="text-sm font-semibold">Tone</p>
+							<div className="mt-2 grid grid-cols-2 gap-2" role="group" aria-label="Tone preset">
+								{tonePresets.map((preset) => <button key={preset.value} type="button" onClick={() => setTonePreset(preset.value)} aria-pressed={tonePreset === preset.value} className={`rounded-lg border p-2.5 text-left transition ${tonePreset === preset.value ? "border-blue bg-secondary ring-1 ring-blue" : "border-input bg-background hover:bg-secondary"}`}><span className="block text-xs font-bold">{preset.label}</span><span className="mt-0.5 block text-[10px] leading-4 text-muted-foreground">{preset.description}</span></button>)}
+							</div>
+							{tonePreset === "custom" && <label className="mt-3 block text-xs font-semibold">Your tone direction<input name="tone" autoComplete="off" value={customTone} onChange={(event) => setCustomTone(event.target.value)} placeholder="e.g. playful and bittersweet" className="mt-2 w-full rounded-lg border border-input bg-background p-3 text-sm font-normal outline-none focus:border-ring"/></label>}
 						</div>
 						<label className="block text-sm font-semibold">
 							Episode count{" "}
@@ -205,7 +201,7 @@ export default function AnalyzePage() {
 						</label>
 						<button
 							type="submit"
-							disabled={running || !idea.trim()}
+							disabled={running || !idea.trim() || (tonePreset === "custom" && !customTone.trim())}
 							className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3.5 text-sm font-semibold text-primary-foreground transition hover:bg-blue disabled:cursor-not-allowed disabled:opacity-50"
 						>
 							{running ? (
@@ -382,6 +378,9 @@ function RiskBadge({ level }: { level: string }) {
 }
 
 function Results({ result, onReset }: { result: Result; onReset: () => void }) {
+	const handleExport = (kind: "scripts" | "all") => {
+		exportPdf(result, kind);
+	};
 	return (
 		<div className="space-y-8 md:space-y-14">
 			<div className="flex flex-wrap items-end justify-between gap-4">
@@ -402,13 +401,11 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 						}).format(new Date(result.created_at))}
 					</p>
 				</div>
-				<button
-					type="button"
-					onClick={onReset}
-					className="rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold transition hover:bg-secondary"
-				>
-					New analysis
-				</button>
+				<div className="flex flex-wrap gap-2">
+					<button type="button" onClick={() => handleExport("scripts")} className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 text-sm font-semibold transition hover:bg-secondary"><Download size={15} aria-hidden="true"/>Scripts PDF</button>
+					<button type="button" onClick={() => handleExport("all")} className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2.5 text-sm font-semibold transition hover:bg-secondary"><Download size={15} aria-hidden="true"/>All data PDF</button>
+					<button type="button" onClick={onReset} className="rounded-lg border border-border bg-card px-4 py-2.5 text-sm font-semibold transition hover:bg-secondary">New analysis</button>
+				</div>
 			</div>
 			<div className="grid gap-px overflow-hidden rounded-xl border border-border bg-border grid-cols-2 sm:grid-cols-4">
 				{[
