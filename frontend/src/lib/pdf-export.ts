@@ -37,6 +37,26 @@ function allDataDocument(result: Result) {
 	].join("");
 }
 
+function printDocument(result: Result, kind: ExportKind, content: string, title: string) {
+	const exportLabel = kind === "scripts" ? "Script package" : "Full series blueprint";
+	return `<!doctype html><html><head><meta charset="utf-8"><title>${title}</title><style>
+		@page{margin:15mm 16mm 18mm}
+		:root{color:#172033;background:#fffdf8;font-family:Arial,sans-serif}
+		body{margin:0;color:#172033;font:10.5pt/1.6 Arial,sans-serif}
+		.cover{border-bottom:2px solid #10295c;padding:0 0 18px;margin:0 0 30px}
+		.kicker{color:#2563a7;font-size:8pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase}
+		h1{color:#10295c;font-family:Georgia,serif;font-size:29pt;line-height:1.05;margin:8px 0 15px}
+		.seed{border-left:3px solid #e27155;margin:0;max-width:42rem;padding:2px 0 2px 12px;color:#43516b;font-size:10pt;line-height:1.5;white-space:pre-wrap}
+		.seed-label{display:block;color:#10295c;font-size:7.5pt;font-weight:700;letter-spacing:.12em;margin-bottom:3px;text-transform:uppercase}
+		.meta{color:#667085;font-size:8.5pt;margin:13px 0 0}
+		section{margin:0 0 30px}
+		h2{color:#10295c;font-family:Georgia,serif;font-size:18pt;line-height:1.15;margin:0 0 14px;padding-bottom:7px;border-bottom:1px solid #dbe2ef}
+		h3{color:#10295c;font-size:12pt;line-height:1.25;margin:0 0 4px}
+		h4{color:#2563a7;font-size:8pt;letter-spacing:.1em;margin:18px 0 5px;text-transform:uppercase}
+		p{margin:0 0 10px}.lede{color:#43516b;font-size:11.5pt;line-height:1.55}.script{break-before:page}.script:first-of-type{break-before:auto}.script-text{background:#f5f7fb;border-left:2px solid #cbd5e1;line-height:1.7;padding:13px 15px;white-space:pre-wrap}article{break-inside:avoid;border-bottom:1px solid #e5e7eb;padding:0 0 16px;margin:0 0 16px}ul{margin:5px 0 0;padding-left:18px}li{margin:0 0 5px}
+	</style></head><body><header class="cover"><div class="kicker">StoryFlow / ${exportLabel}</div><h1>Series blueprint</h1><p class="seed"><span class="seed-label">Story seed</span>${escapeHtml(result.story_idea)}</p><p class="meta">Created ${escapeHtml(new Date(result.created_at).toLocaleString())} · ${result.episode_planner.total_episodes} episodes · ${result.episode_scripts.total_word_count.toLocaleString()} words</p></header>${content}</body></html>`;
+}
+
 export function exportPdf(result: Result, kind: ExportKind) {
 	const content = kind === "scripts" ? scriptsDocument(result) : allDataDocument(result);
 	const safeTitle = `${kind === "scripts" ? "Scripts" : "Full blueprint"} — StoryFlow`;
@@ -51,6 +71,6 @@ export function exportPdf(result: Result, kind: ExportKind) {
 		printWindow.focus();
 		printWindow.print();
 	};
-	frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><title>${safeTitle}</title><style>@page{margin:16mm}body{color:#172033;font:11pt/1.55 Arial,sans-serif}h1,h2,h3,h4{color:#10295c}h1{font-size:25pt;margin:0}h2{font-size:17pt;margin:34px 0 12px;border-bottom:1px solid #dbe2ef;padding-bottom:6px}h3{font-size:13pt;margin-bottom:5px}h4{font-size:10pt;text-transform:uppercase;letter-spacing:.08em;margin:18px 0 4px}.meta{color:#5c6576;font-size:9pt}.lede{font-size:12pt}.script{break-before:page}.script:first-of-type{break-before:auto}.script-text{white-space:pre-wrap}article{break-inside:avoid;border-bottom:1px solid #e5e7eb;padding:0 0 16px;margin:0 0 16px}ul{margin-top:4px;padding-left:18px}</style></head><body><h1>${escapeHtml(result.story_idea)}</h1><p class="meta">StoryFlow export · ${escapeHtml(new Date(result.created_at).toLocaleString())}</p>${content}</body></html>`;
+	frame.srcdoc = printDocument(result, kind, content, safeTitle);
 	document.body.append(frame);
 }

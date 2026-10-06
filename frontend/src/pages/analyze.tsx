@@ -388,9 +388,9 @@ function Results({ result, onReset }: { result: Result; onReset: () => void }) {
 					<p className="text-[11px] font-bold tracking-[.16em] text-blue uppercase">
 						Series blueprint / complete
 					</p>
-					<h2 className="font-display mt-2 max-w-3xl wrap-break-words text-balance text-4xl leading-tight sm:text-5xl">
+					<p className="mt-3 max-w-3xl whitespace-pre-wrap text-sm leading-6 text-muted-foreground sm:text-base">
 						{result.story_idea}
-					</h2>
+					</p>
 					<p className="mt-3 text-xs text-muted-foreground">
 						{result.episode_planner.target_audience} ·{" "}
 						{result.revisions_completed} revision
